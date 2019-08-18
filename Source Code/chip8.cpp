@@ -10,12 +10,49 @@ chip8::~chip8()
 {
 }
 
+void chip8::Run()
+{
+}
+
+void chip8::KeyPressed(int key)
+{
+    m_KeyState[key] = 1;
+}
+
+void chip8::KeyReleased(int key)
+{
+    m_KeyState[key] = 0;
+}
+
+BYTE* chip8::getScreenData()
+{
+    BYTE data[32 * 64];
+    int i = 0;
+    for (int y = 0; y < 32; y++)
+    {
+        for (int x = 0; x < 64; x++, i++)
+        {
+            data[i] = m_ScreenData[y][x];
+        }
+    }
+
+    return data;
+}
+
+/*
+    PRIVATE Functions
+*/
 void chip8::CPUReset()
 {
     m_AdressI = 0;
     m_ProgramCounter = 0x200; // Game is loaded into 0x200 so the first instruction is there
+
     memset(m_Registers, 0, sizeof(m_Registers)); // Set registers to 0
     memset(m_GameMemory, 0, sizeof(m_GameMemory)); // Set Memory to 0
+    memset(m_KeyState, 0, sizeof(m_KeyState)); // Set keyStates
+
+    m_DelayTimer = 0;
+    m_Soundtimer = 0;
 
     loadRom();
 }
@@ -398,31 +435,75 @@ void chip8::OpcodeDXYN(WORD opcode)
 void chip8::OpcodeEX9E(WORD opcode)
 {
     // Key pressed instruction
+    int regx = opcode & 0x0F00;
+    regx >>= 8;
+
+    int key = m_Registers[regx];
+
+    if (m_KeyState[key] == 1)
+        m_ProgramCounter += 2;
 }
 
 void chip8::OpcodeEXA1(WORD opcode)
 {
     // Key pressed instruction
+    int regx = opcode & 0x0F00; // vrati recimo 0x200, ali se trazi 0x2 pa se shifta za 2 znamenke 2 * 4
+    regx >>= 8;
+
+    int key = m_Registers[regx];
+
+    if (m_KeyState[key] == 0)
+        m_ProgramCounter += 2;
 }
 
 void chip8::OpcodeFX07(WORD opcode)
 {
     // delay timer value
+    int regx = opcode & 0x0F00;
+    regx >>= 8;
+
+    m_Registers[regx] = m_DelayTimer;
 }
 
 void chip8::OpcodeFX0A(WORD opcode)
 {
-    // Key press instruction
+    // Wait for key press instruction
+    int regx = opcode & 0x0F00;
+    regx >>= 8;
+
+    int keypressed = -1;
+
+    for (int i = 0; i < 16; i++)
+    {
+        if (m_KeyState[i] > 0)
+        {
+            keypressed = i;
+            break;
+        }
+    }
+
+    if (keypressed == -1)
+        m_ProgramCounter -= 2;
+    else
+        m_Registers[regx] = keypressed;
 }
 
 void chip8::OpcodeFX15(WORD opcode)
 {
     // Delay timer
+    int regx = opcode & 0x0F00;
+    regx >>= 8;
+
+    m_DelayTimer = m_Registers[regx];
 }
 
 void chip8::OpcodeFX18(WORD opcode)
 {
     // Sound timer
+    int regx = opcode & 0x0F00;
+    regx >>= 0;
+
+    m_Soundtimer = m_Registers[regx];
 }
 
 void chip8::OpcodeFX1E(WORD opcode)

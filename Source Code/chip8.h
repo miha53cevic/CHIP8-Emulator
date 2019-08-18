@@ -14,15 +14,26 @@ public:
     chip8();
     ~chip8();
 
+    void Run();
+    void KeyPressed(int key);
+    void KeyReleased(int key);
+
+    BYTE* getScreenData();
+
 private:
     BYTE m_GameMemory[0xFFF];
     BYTE m_Registers[16];
     WORD m_AdressI;
     WORD m_ProgramCounter;
     std::stack<WORD> m_stack;
-    BYTE m_ScreenData[32][64];
 
-public:
+    BYTE m_ScreenData[32][64];
+    BYTE m_KeyState[16];
+
+    BYTE m_DelayTimer;
+    BYTE m_Soundtimer;
+
+private:
     void CPUReset();
     void loadRom();
 
