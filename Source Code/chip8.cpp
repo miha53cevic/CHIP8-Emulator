@@ -1,16 +1,26 @@
 #include "chip8.h"
 #include <ctime>
+#include <string>
 
 chip8::chip8()
 {
+    // Seed - used for rand()
     srand(time(0));
+
+    // Setup CPU
+    CPUReset();
+
+    // Clear display
+    for (int y = 0; y < 32; y++)
+    {
+        for (int x = 0; x < 64; x++)
+        {
+            m_ScreenData[y][x] = 0;
+        }
+    }
 }
 
 chip8::~chip8()
-{
-}
-
-void chip8::Run()
 {
 }
 
@@ -24,19 +34,38 @@ void chip8::KeyReleased(int key)
     m_KeyState[key] = 0;
 }
 
-BYTE* chip8::getScreenData()
+void chip8::Run()
 {
-    BYTE data[32 * 64];
-    int i = 0;
-    for (int y = 0; y < 32; y++)
-    {
-        for (int x = 0; x < 64; x++, i++)
-        {
-            data[i] = m_ScreenData[y][x];
-        }
-    }
+    ExecuteOpcode();
+}
 
-    return data;
+void chip8::loadRom(std::string fileName)
+{
+    std::string rom = "roms/" + fileName + ".ch8";
+
+    FILE *in;
+    if (in = fopen(rom.c_str(), "rb"))
+    {
+        fread(&m_GameMemory[0x200], 0xfff, 1, in);
+        fclose(in);
+
+        printf("Loaded rom successfuly\n");
+    }
+    else printf("Could not load rom!\n");
+}
+
+void chip8::DecreaseTimers()
+{
+    if (m_DelayTimer > 0)
+        m_DelayTimer--;
+
+    if (m_Soundtimer > 0)
+        m_Soundtimer--;
+}
+
+BYTE chip8::getScreenData(int x, int y)
+{
+    return m_ScreenData[y][x];
 }
 
 /*
@@ -53,21 +82,6 @@ void chip8::CPUReset()
 
     m_DelayTimer = 0;
     m_Soundtimer = 0;
-
-    loadRom();
-}
-
-void chip8::loadRom()
-{
-    FILE *in;
-    if (in = fopen("roms/Space Invaders.ch8", "rb"))
-    {
-        fread(&m_GameMemory[0x200], 0xfff, 1, in);
-        fclose(in);
-
-        printf("Loaded rom successfuly\n");
-    }
-    else printf("Could not load rom!\n");
 }
 
 WORD chip8::getNextOpcode()
@@ -186,6 +200,18 @@ void chip8::DecodeOpCodeF(WORD opcode)
 void chip8::Opcode00E0(WORD opcode)
 {
     // Clear display
+    for (int y = 0; y < 32; y++)
+    {
+        for (int x = 0; x < 64; x++)
+        {
+            m_ScreenData[y][x] = 0;
+        }
+    }
+
+    #ifdef DEBUG
+        std::cout << "Clear Screen\n";
+    #endif // DEBUG
+
 }
 
 void chip8::Opcode00EE(WORD opcode)

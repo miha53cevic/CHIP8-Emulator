@@ -1,6 +1,8 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
 
+//#define DEBUG
+
 #include <stack>
 #include <fstream>
 #include <iostream>
@@ -14,11 +16,15 @@ public:
     chip8();
     ~chip8();
 
-    void Run();
     void KeyPressed(int key);
     void KeyReleased(int key);
 
-    BYTE* getScreenData();
+    void Run();
+    void loadRom(std::string fileName);
+
+    void DecreaseTimers();
+
+    BYTE getScreenData(int x, int y);
 
 private:
     BYTE m_GameMemory[0xFFF];
@@ -35,7 +41,6 @@ private:
 
 private:
     void CPUReset();
-    void loadRom();
 
     WORD getNextOpcode();
     void ExecuteOpcode();
