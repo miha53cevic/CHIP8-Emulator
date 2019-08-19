@@ -163,7 +163,7 @@ private:
 int main()
 {
     App app;
-    app.Construct(640, 480, L"CHIP8 Emulator");
+    app.Construct(640, 320, L"CHIP8 Emulator");
     app.Start();
     
     return 0;
