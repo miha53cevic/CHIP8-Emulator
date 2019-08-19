@@ -18,6 +18,12 @@ public:
             {
                 in >> line;
 
+                if (line == "Rom")
+                {
+                    in >> m_romName;
+                }
+                else std::cout << "Could not find line Rom\n";
+
                 if (line == "OpcodesPerFrame")
                 {
                     in >> m_OpcodesPerFrame;
@@ -25,7 +31,7 @@ public:
 
                     std::cout << "Loaded custom OpcodesPerFrame\n";
                 }
-                else std::cout << "Could not find line OpcodesPerFrame!";
+                else std::cout << "Could not find line OpcodesPerFrame!\n";
             }
         }
         else
@@ -41,6 +47,7 @@ private:
     chip8 m_emulator;
 
     unsigned int m_OpcodesPerFrame;
+    std::string m_romName;
 
 private:
     void DrawPixel(int x, int y, int width)
@@ -131,7 +138,7 @@ private:
         EnableVSync(true);
 
         // Load rom
-        m_emulator.loadRom("Space Invaders");
+        m_emulator.loadRom(m_romName);
 
         return true;
     }
