@@ -1,10 +1,10 @@
 # CHIP8-Emulator
 CHIP8 emulator written in C++ / SFML
 
-# CHIP8 Programs & Games
+## CHIP8 Programs & Games
 https://github.com/dmatlack/chip8/tree/master/roms
 
-# Literature used
+## Literature used
 - https://www.miniwebtool.com/bitwise-calculator/ 
   - used for figuring out hex operations
 - https://en.wikipedia.org/wiki/CHIP-8
