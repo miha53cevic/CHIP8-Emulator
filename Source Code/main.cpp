@@ -71,7 +71,11 @@ private:
         {
             std::stringstream ss;
             ss << std::hex << std::uppercase << i;
-            string += "V" + ss.str() + "  " + std::to_string(m_emulator.getRegister(i)) + "\n";
+
+            std::stringstream ss2;
+            ss2 << "0x" << std::hex << std::uppercase << (int)m_emulator.getRegister(i);
+
+            string += "V" + ss.str() + "  " + ss2.str() + "\n";
         }
 
         m_text.setString(string);
