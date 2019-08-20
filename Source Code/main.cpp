@@ -22,7 +22,6 @@ public:
                 {
                     in >> m_romName;
                 }
-                else std::cout << "Could not find line Rom\n";
 
                 if (line == "OpcodesPerFrame")
                 {
@@ -31,7 +30,6 @@ public:
 
                     std::cout << "Loaded custom OpcodesPerFrame\n";
                 }
-                else std::cout << "Could not find line OpcodesPerFrame!\n";
             }
         }
         else
