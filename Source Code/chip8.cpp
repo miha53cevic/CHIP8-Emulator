@@ -71,6 +71,16 @@ BYTE chip8::getScreenData(int x, int y)
     return m_ScreenData[y][x];
 }
 
+BYTE chip8::getRegister(int index)
+{
+    return m_Registers[index];
+}
+
+BYTE chip8::getKeyState(int index)
+{
+    return m_KeyState[index];
+}
+
 /*
     PRIVATE Functions
 */

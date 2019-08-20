@@ -26,6 +26,9 @@ public:
 
     BYTE getScreenData(int x, int y);
 
+    BYTE getRegister(int index);
+    BYTE getKeyState(int index);
+
 private:
     BYTE m_GameMemory[0xFFF];
     BYTE m_Registers[16];

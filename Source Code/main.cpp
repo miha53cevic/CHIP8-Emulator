@@ -2,6 +2,8 @@
 #include "chip8.h"
 
 #include <fstream>
+#include <iomanip>
+#include <sstream>
 
 class App : public mihaSimpleSFML
 {
@@ -42,10 +44,13 @@ public:
     }
 
 private:
-    chip8 m_emulator;
+    chip8           m_emulator;
 
-    unsigned int m_OpcodesPerFrame;
-    std::string m_romName;
+    unsigned int    m_OpcodesPerFrame;
+    std::string     m_romName;
+
+    sf::Font        m_font;
+    sf::Text        m_text;
 
 private:
     void DrawPixel(int x, int y, int width)
@@ -56,6 +61,22 @@ private:
         pixel.setFillColor(sf::Color::Black);
 
         Draw(pixel);
+    }
+
+    void DumpRegisters()
+    {
+        std::string string;
+
+        for (int i = 0x0; i <= 0xF; i++)
+        {
+            std::stringstream ss;
+            ss << std::hex << std::uppercase << i;
+            string += "V" + ss.str() + "  " + std::to_string(m_emulator.getRegister(i)) + "\n";
+        }
+
+        m_text.setString(string);
+
+        Draw(m_text);
     }
 
 private:
@@ -129,6 +150,18 @@ private:
 private:
     bool OnUserCreate() override
     {
+        // Setup text
+        if (!m_font.loadFromFile("arial.ttf"))
+        {
+            // error
+        }
+        else m_text.setFont(m_font);
+
+        m_text.setCharacterSize(16);
+        m_text.setPosition(650, 20);
+        m_text.setOutlineColor(sf::Color::Black);
+        m_text.setFillColor(sf::Color::Black);
+
         // Set background fill colour
         setBackgroundColor(sf::Color::White);
 
@@ -161,6 +194,8 @@ private:
             }
         }
 
+        DumpRegisters();
+
         return true;
     }
 };
@@ -168,7 +203,7 @@ private:
 int main()
 {
     App app;
-    app.Construct(640, 320, L"CHIP8 Emulator");
+    app.Construct(768, 320, L"CHIP8 Emulator");
     app.Start();
     
     return 0;
