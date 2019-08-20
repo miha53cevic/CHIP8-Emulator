@@ -61,6 +61,9 @@ void chip8::DecreaseTimers()
 
     if (m_Soundtimer > 0)
         m_Soundtimer--;
+
+    //if (m_Soundtimer > 0)
+        // play beep sound
 }
 
 BYTE chip8::getScreenData(int x, int y)
