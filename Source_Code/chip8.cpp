@@ -1,6 +1,7 @@
 #include "chip8.h"
 #include <ctime>
 #include <string>
+#include <cstring>
 
 chip8::chip8()
 {
@@ -89,9 +90,9 @@ void chip8::CPUReset()
     m_AdressI = 0;
     m_ProgramCounter = 0x200; // Game is loaded into 0x200 so the first instruction is there
 
-    memset(m_Registers, 0, sizeof(m_Registers)); // Set registers to 0
-    memset(m_GameMemory, 0, sizeof(m_GameMemory)); // Set Memory to 0
-    memset(m_KeyState, 0, sizeof(m_KeyState)); // Set keyStates
+    std::memset(m_Registers, 0, sizeof(m_Registers)); // Set registers to 0
+    std::memset(m_GameMemory, 0, sizeof(m_GameMemory)); // Set Memory to 0
+    std::memset(m_KeyState, 0, sizeof(m_KeyState)); // Set keyStates
 
     m_DelayTimer = 0;
     m_Soundtimer = 0;
