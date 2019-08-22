@@ -15,7 +15,7 @@ https://github.com/dmatlack/chip8/tree/master/roms
 ## How to build
   ```bash
   git clone https://github.com/miha53cevic/CHIP8-Emulator.git
-  cd CHIP88-Emulator
+  cd CHIP8-Emulator
   cmake .
   make
   ```
