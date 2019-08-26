@@ -1,6 +1,8 @@
 # CHIP8-Emulator
 CHIP8 emulator written in C++ / SFML
 
+![](https://media.giphy.com/media/KAdjN9gcGXQcrJy4E6/giphy.gif)
+
 ## CHIP8 Programs & Games
 https://github.com/dmatlack/chip8/tree/master/roms
 
