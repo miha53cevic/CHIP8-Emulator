@@ -6,9 +6,12 @@
 #include <stack>
 #include <fstream>
 #include <iostream>
+#include <cstdint> // Allows uint8_t
 
-typedef unsigned char BYTE;      //  8-bits
-typedef unsigned short int WORD; // 16-bits
+/*
+// WORD 16-bit
+// BYTE  8-bit
+*/
 
 class chip8
 {
@@ -24,71 +27,71 @@ public:
 
     void DecreaseTimers();
 
-    BYTE getScreenData(int x, int y);
+    uint8_t getScreenData(int x, int y);
 
-    BYTE getRegister(int index);
-    BYTE getKeyState(int index);
+    uint8_t getRegister(int index);
+    uint8_t getKeyState(int index);
 
 private:
-    BYTE m_GameMemory[0xFFF];
-    BYTE m_Registers[16];
-    WORD m_AdressI;
-    WORD m_ProgramCounter;
-    std::stack<WORD> m_stack;
+    uint8_t m_GameMemory[0xFFF];
+    uint8_t m_Registers[16];
+    uint16_t m_AdressI;
+    uint16_t m_ProgramCounter;
+    std::stack<uint16_t> m_stack;
 
-    BYTE m_ScreenData[32][64];
-    BYTE m_KeyState[16];
+    uint8_t m_ScreenData[32][64];
+    uint8_t m_KeyState[16];
 
-    BYTE m_DelayTimer;
-    BYTE m_Soundtimer;
+    uint8_t m_DelayTimer;
+    uint8_t m_Soundtimer;
 
 private:
     void CPUReset();
 
-    WORD getNextOpcode();
+    uint16_t getNextOpcode();
     void ExecuteOpcode();
 
-    void DecodeOpcode0(WORD opcode);
-    void DecodeOpcode8(WORD opcode);
-    void DecodeOpcodeE(WORD opcode);
-    void DecodeOpCodeF(WORD opcode);
+    void DecodeOpcode0(uint16_t opcode);
+    void DecodeOpcode8(uint16_t opcode);
+    void DecodeOpcodeE(uint16_t opcode);
+    void DecodeOpCodeF(uint16_t opcode);
 
 private:
     // OPCODES
-    //void Opcode0NNN(WORD opcode); Most roms don't use it
-    void Opcode00E0(WORD opcode);
-    void Opcode00EE(WORD opcode);
-    void Opcode1NNN(WORD opcode);
-    void Opcode2NNN(WORD opcode);
-    void Opcode3XNN(WORD opcode);
-    void Opcode4XNN(WORD opcode);
-    void Opcode5XY0(WORD opcode);
-    void Opcode6XNN(WORD opcode);
-    void Opcode7XNN(WORD opcode);
-    void Opcode8XY0(WORD opcode);
-    void Opcode8XY1(WORD opcode);
-    void Opcode8XY2(WORD opcode);
-    void Opcode8XY3(WORD opcode);
-    void Opcode8XY4(WORD opcode);
-    void Opcode8XY5(WORD opcode);
-    void Opcode8XY6(WORD opcode);
-    void Opcode8XY7(WORD opcode);
-    void Opcode8XYE(WORD opcode);
-    void Opcode9XY0(WORD opcode);
-    void OpcodeANNN(WORD opcode);
-    void OpcodeBNNN(WORD opcode);
-    void OpcodeCXNN(WORD opcode);
-    void OpcodeDXYN(WORD opcode);
-    void OpcodeEX9E(WORD opcode);
-    void OpcodeEXA1(WORD opcode);
-    void OpcodeFX07(WORD opcode);
-    void OpcodeFX0A(WORD opcode);
-    void OpcodeFX15(WORD opcode);
-    void OpcodeFX18(WORD opcode);
-    void OpcodeFX1E(WORD opcode);
-    void OpcodeFX29(WORD opcode);
-    void OpcodeFX33(WORD opcode);
-    void OpcodeFX55(WORD opcode);
-    void OpcodeFX65(WORD opcode);
+    //void Opcode0NNN(uint16_t opcode); Most roms don't use it
+    void Opcode00E0(uint16_t opcode);
+    void Opcode00EE(uint16_t opcode);
+    void Opcode1NNN(uint16_t opcode);
+    void Opcode2NNN(uint16_t opcode);
+    void Opcode3XNN(uint16_t opcode);
+    void Opcode4XNN(uint16_t opcode);
+    void Opcode5XY0(uint16_t opcode);
+    void Opcode6XNN(uint16_t opcode);
+    void Opcode7XNN(uint16_t opcode);
+    void Opcode8XY0(uint16_t opcode);
+    void Opcode8XY1(uint16_t opcode);
+    void Opcode8XY2(uint16_t opcode);
+    void Opcode8XY3(uint16_t opcode);
+    void Opcode8XY4(uint16_t opcode);
+    void Opcode8XY5(uint16_t opcode);
+    void Opcode8XY6(uint16_t opcode);
+    void Opcode8XY7(uint16_t opcode);
+    void Opcode8XYE(uint16_t opcode);
+    void Opcode9XY0(uint16_t opcode);
+    void OpcodeANNN(uint16_t opcode);
+    void OpcodeBNNN(uint16_t opcode);
+    void OpcodeCXNN(uint16_t opcode);
+    void OpcodeDXYN(uint16_t opcode);
+    void OpcodeEX9E(uint16_t opcode);
+    void OpcodeEXA1(uint16_t opcode);
+    void OpcodeFX07(uint16_t opcode);
+    void OpcodeFX0A(uint16_t opcode);
+    void OpcodeFX15(uint16_t opcode);
+    void OpcodeFX18(uint16_t opcode);
+    void OpcodeFX1E(uint16_t opcode);
+    void OpcodeFX29(uint16_t opcode);
+    void OpcodeFX33(uint16_t opcode);
+    void OpcodeFX55(uint16_t opcode);
+    void OpcodeFX65(uint16_t opcode);
 };
 

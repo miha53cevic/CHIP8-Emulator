@@ -1,7 +1,6 @@
 #include "chip8.h"
 #include <ctime>
 #include <string>
-#include <cstring>
 
 chip8::chip8()
 {
@@ -67,17 +66,17 @@ void chip8::DecreaseTimers()
         // play beep sound
 }
 
-BYTE chip8::getScreenData(int x, int y)
+uint8_t chip8::getScreenData(int x, int y)
 {
     return m_ScreenData[y][x];
 }
 
-BYTE chip8::getRegister(int index)
+uint8_t chip8::getRegister(int index)
 {
     return m_Registers[index];
 }
 
-BYTE chip8::getKeyState(int index)
+uint8_t chip8::getKeyState(int index)
 {
     return m_KeyState[index];
 }
@@ -90,22 +89,22 @@ void chip8::CPUReset()
     m_AdressI = 0;
     m_ProgramCounter = 0x200; // Game is loaded into 0x200 so the first instruction is there
 
-    std::memset(m_Registers, 0, sizeof(m_Registers)); // Set registers to 0
-    std::memset(m_GameMemory, 0, sizeof(m_GameMemory)); // Set Memory to 0
-    std::memset(m_KeyState, 0, sizeof(m_KeyState)); // Set keyStates
+    memset(m_Registers, 0, sizeof(m_Registers)); // Set registers to 0
+    memset(m_GameMemory, 0, sizeof(m_GameMemory)); // Set Memory to 0
+    memset(m_KeyState, 0, sizeof(m_KeyState)); // Set keyStates
 
     m_DelayTimer = 0;
     m_Soundtimer = 0;
 }
 
-WORD chip8::getNextOpcode()
+uint16_t chip8::getNextOpcode()
 {
-    // To create the result we have to combine 2 memory spots to get a 2 BYTE long opcode
+    // To create the result we have to combine 2 memory spots to get a 2 uint8_t long opcode
     // so memory at 0x200 and 0x201 should be combined to create the opcode
-    // since both are 1byte long we shift 0x200 8 spaces to the left and do a
-    // logical OR operation to add the second memory slot thus resulting in a 2BYTE opcode
+    // since both are 1uint8_t long we shift 0x200 8 spaces to the left and do a
+    // logical OR operation to add the second memory slot thus resulting in a 2uint8_t opcode
 
-    WORD result = 0; // opcode
+    uint16_t result = 0; // opcode
     result = m_GameMemory[m_ProgramCounter];
     result <<= 8; // Shift 8 times left
     result = result | m_GameMemory[m_ProgramCounter + 1]; // Combine with logical OR, with the next spot in memory
@@ -119,13 +118,13 @@ void chip8::ExecuteOpcode()
     /*
         DECODING EXAMPLE for OPCODE 0x1234
 
-        WORD firstNumber = opcode & 0xF000 ; // would give 0x1000
-        WORD secondNumber = opcode & 0x0F00 ; // would give 0x0200
-        WORD secondAndLast = opcode & 0x0F0F ; // would give 0x0204
-        WORD lastTwoNumbers = opcode & 0x00FF ; // would give 0x0034
+        uint16_t firstNumber = opcode & 0xF000 ; // would give 0x1000
+        uint16_t secondNumber = opcode & 0x0F00 ; // would give 0x0200
+        uint16_t secondAndLast = opcode & 0x0F0F ; // would give 0x0204
+        uint16_t lastTwoNumbers = opcode & 0x00FF ; // would give 0x0034
     */
 
-    WORD opcode = getNextOpcode();
+    uint16_t opcode = getNextOpcode();
 
     // Decode Opcode
     switch (opcode & 0xF000)
@@ -151,7 +150,7 @@ void chip8::ExecuteOpcode()
     }
 }
 
-void chip8::DecodeOpcode0(WORD opcode)
+void chip8::DecodeOpcode0(uint16_t opcode)
 {
     switch (opcode & 0x000F)
     {
@@ -162,7 +161,7 @@ void chip8::DecodeOpcode0(WORD opcode)
     }
 }
 
-void chip8::DecodeOpcode8(WORD opcode)
+void chip8::DecodeOpcode8(uint16_t opcode)
 {
     switch (opcode & 0x000F)
     {
@@ -180,7 +179,7 @@ void chip8::DecodeOpcode8(WORD opcode)
     }
 }
 
-void chip8::DecodeOpcodeE(WORD opcode)
+void chip8::DecodeOpcodeE(uint16_t opcode)
 {
     switch (opcode & 0x000F)
     {
@@ -191,7 +190,7 @@ void chip8::DecodeOpcodeE(WORD opcode)
     }
 }
 
-void chip8::DecodeOpCodeF(WORD opcode)
+void chip8::DecodeOpCodeF(uint16_t opcode)
 {
     switch (opcode & 0x00FF)
     {
@@ -211,7 +210,7 @@ void chip8::DecodeOpCodeF(WORD opcode)
 /*
     OPCODE Definitions
 */
-void chip8::Opcode00E0(WORD opcode)
+void chip8::Opcode00E0(uint16_t opcode)
 {
     // Clear display
     for (int y = 0; y < 32; y++)
@@ -228,121 +227,121 @@ void chip8::Opcode00E0(WORD opcode)
 
 }
 
-void chip8::Opcode00EE(WORD opcode)
+void chip8::Opcode00EE(uint16_t opcode)
 {
     m_ProgramCounter = m_stack.top();
     m_stack.pop();
 }
 
-void chip8::Opcode1NNN(WORD opcode)
+void chip8::Opcode1NNN(uint16_t opcode)
 {
     m_ProgramCounter = opcode & 0x0FFF;
 }
 
-void chip8::Opcode2NNN(WORD opcode)
+void chip8::Opcode2NNN(uint16_t opcode)
 {
     m_stack.push(m_ProgramCounter);
     m_ProgramCounter = opcode & 0x0FFF;
 }
 
-void chip8::Opcode3XNN(WORD opcode)
+void chip8::Opcode3XNN(uint16_t opcode)
 {
-    int nn = opcode & 0x00FF;
-    int regx = opcode & 0x0F00;
+    uint16_t nn = opcode & 0x00FF;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8; // shift jer inace dobimo 0x200, a ako shiftamo dobijemo 0x2, hex znamenku mozemo prikazati pomocu 4 bita znaci da ako hocemo pomaknuti za jedno mjesto znamenku shiftamo 4, a s obzirom da hocemo 2 mjesta pomaknuti shifta se 8
 
     if (m_Registers[regx] == nn)
         m_ProgramCounter += 2;
 }
 
-void chip8::Opcode4XNN(WORD opcode)
+void chip8::Opcode4XNN(uint16_t opcode)
 {
-    int nn = opcode & 0x00FF;
-    int regx = opcode & 0x0F00;
+    uint16_t nn = opcode & 0x00FF;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
 
     if (m_Registers[regx] != nn)
         m_ProgramCounter += 2;
 }
 
-void chip8::Opcode5XY0(WORD opcode)
+void chip8::Opcode5XY0(uint16_t opcode)
 {
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
-    int regy = opcode & 0x00F0;
+    uint16_t regy = opcode & 0x00F0;
     regy >>= 4; // shift 4 jer se dobije 0x20, a trazi se 0x2
 
     if (m_Registers[regx] == m_Registers[regy])
         m_ProgramCounter += 2; // skip next instruction
 }
 
-void chip8::Opcode6XNN(WORD opcode)
+void chip8::Opcode6XNN(uint16_t opcode)
 {
-    int nn = opcode & 0x00FF;
-    int regx = opcode & 0x0F00;
+    uint16_t nn = opcode & 0x00FF;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
 
     m_Registers[regx] = nn;
 }
 
-void chip8::Opcode7XNN(WORD opcode)
+void chip8::Opcode7XNN(uint16_t opcode)
 {
-    int nn = opcode & 0x00FF;
-    int regx = opcode & 0x0F00;
+    uint16_t nn = opcode & 0x00FF;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
 
     m_Registers[regx] += nn;
 }
 
-void chip8::Opcode8XY0(WORD opcode)
+void chip8::Opcode8XY0(uint16_t opcode)
 {
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
-    int regy = opcode & 0x00F0;
+    uint16_t regy = opcode & 0x00F0;
     regy >>= 4;
 
     m_Registers[regx] = m_Registers[regy];
 }
 
-void chip8::Opcode8XY1(WORD opcode)
+void chip8::Opcode8XY1(uint16_t opcode)
 {
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
-    int regy = opcode & 0x00F0;
+    uint16_t regy = opcode & 0x00F0;
     regy >>= 4;
 
     m_Registers[regx] = m_Registers[regx] | m_Registers[regy];
 }
 
-void chip8::Opcode8XY2(WORD opcode)
+void chip8::Opcode8XY2(uint16_t opcode)
 {
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
-    int regy = opcode & 0x00F0;
+    uint16_t regy = opcode & 0x00F0;
     regy >>= 4;
 
     m_Registers[regx] = m_Registers[regx] & m_Registers[regy];
 }
 
-void chip8::Opcode8XY3(WORD opcode)
+void chip8::Opcode8XY3(uint16_t opcode)
 {
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
-    int regy = opcode & 0x00F0;
+    uint16_t regy = opcode & 0x00F0;
     regy >>= 4;
 
     m_Registers[regx] = m_Registers[regx] ^ m_Registers[regy];
 }
 
-void chip8::Opcode8XY4(WORD opcode)
+void chip8::Opcode8XY4(uint16_t opcode)
 {
     m_Registers[0xF] = 0;
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
-    int regy = opcode & 0x00F0;
+    uint16_t regy = opcode & 0x00F0;
     regy >>= 4;
 
-    int value = m_Registers[regx] + m_Registers[regy];
+    uint16_t value = m_Registers[regx] + m_Registers[regy];
 
     if (value > 255)
         m_Registers[0xF] = 1;
@@ -350,16 +349,16 @@ void chip8::Opcode8XY4(WORD opcode)
     m_Registers[regx] = m_Registers[regx] + m_Registers[regy];
 }
 
-void chip8::Opcode8XY5(WORD opcode)
+void chip8::Opcode8XY5(uint16_t opcode)
 {
     m_Registers[0xF] = 0;
-    int regx = opcode & 0x0F00; // mask off reg x
+    uint16_t regx = opcode & 0x0F00; // mask off reg x
     regx = regx >> 8; // shift x across 
-    int regy = opcode & 0x00F0; // mask off reg y 
+    uint16_t regy = opcode & 0x00F0; // mask off reg y 
     regy = regy >> 4; // shift y across 
 
-    int xval = m_Registers[regx];
-    int yval = m_Registers[regy];
+    uint16_t xval = m_Registers[regx];
+    uint16_t yval = m_Registers[regy];
 
     if (xval > yval) 
         m_Registers[0xF] = 1;
@@ -367,25 +366,25 @@ void chip8::Opcode8XY5(WORD opcode)
     m_Registers[regx] = xval - yval;
 }
 
-void chip8::Opcode8XY6(WORD opcode)
+void chip8::Opcode8XY6(uint16_t opcode)
 {
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
 
     m_Registers[0xF] = m_Registers[regx] & 0x1;
     m_Registers[regx] >>= 1;
 }
 
-void chip8::Opcode8XY7(WORD opcode)
+void chip8::Opcode8XY7(uint16_t opcode)
 {
     m_Registers[0xF] = 0;
-    int regx = opcode & 0x0F00; // mask off reg x
+    uint16_t regx = opcode & 0x0F00; // mask off reg x
     regx = regx >> 8; // shift x across 
-    int regy = opcode & 0x00F0; // mask off reg y 
+    uint16_t regy = opcode & 0x00F0; // mask off reg y 
     regy = regy >> 4; // shift y across 
 
-    int xval = m_Registers[regx];
-    int yval = m_Registers[regy];
+    uint16_t xval = m_Registers[regx];
+    uint16_t yval = m_Registers[regy];
 
     if (xval < yval)
         m_Registers[0xF] = 1;
@@ -393,65 +392,65 @@ void chip8::Opcode8XY7(WORD opcode)
     m_Registers[regx] = yval - xval;
 }
 
-void chip8::Opcode8XYE(WORD opcode)
+void chip8::Opcode8XYE(uint16_t opcode)
 {
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
 
     m_Registers[0xF] = m_Registers[regx] >> 7;
     m_Registers[regx] <<= 1;
 }
 
-void chip8::Opcode9XY0(WORD opcode)
+void chip8::Opcode9XY0(uint16_t opcode)
 {
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
-    int regy = opcode & 0x00F0;
+    uint16_t regy = opcode & 0x00F0;
     regy >>= 4; // shift 4 jer se dobije 0x20, a trazi se 0x2
 
     if (m_Registers[regx] != m_Registers[regy])
         m_ProgramCounter += 2; // skip next instruction
 }
 
-void chip8::OpcodeANNN(WORD opcode)
+void chip8::OpcodeANNN(uint16_t opcode)
 {
     m_AdressI = opcode & 0x0FFF;
 }
 
-void chip8::OpcodeBNNN(WORD opcode)
+void chip8::OpcodeBNNN(uint16_t opcode)
 {
-    int nnn = opcode & 0x0FFF;
+    uint16_t nnn = opcode & 0x0FFF;
     m_ProgramCounter = nnn + m_Registers[0];
 }
 
-void chip8::OpcodeCXNN(WORD opcode)
+void chip8::OpcodeCXNN(uint16_t opcode)
 {
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
-    int nn = opcode & 0x00FF;
+    uint16_t nn = opcode & 0x00FF;
 
     m_Registers[regx] = nn & (rand() % 256);
 }
 
-void chip8::OpcodeDXYN(WORD opcode)
+void chip8::OpcodeDXYN(uint16_t opcode)
 {
     // Draws on the screen
     
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx = regx >> 8;
-    int regy = opcode & 0x00F0;
+    uint16_t regy = opcode & 0x00F0;
     regy = regy >> 4;
 
-    int height = opcode & 0x000F;
-    int coordx = m_Registers[regx];
-    int coordy = m_Registers[regy];
+    uint16_t height = opcode & 0x000F;
+    uint16_t coordx = m_Registers[regx];
+    uint16_t coordy = m_Registers[regy];
 
     m_Registers[0xf] = 0;
 
     // loop for the amount of vertical lines needed to draw
     for (int yline = 0; yline < height; yline++)
     {
-        BYTE data = m_GameMemory[m_AdressI + yline];
+        uint8_t data = m_GameMemory[m_AdressI + yline];
         int xpixelinv = 7;
         int xpixel = 0;
 
@@ -472,43 +471,43 @@ void chip8::OpcodeDXYN(WORD opcode)
     }
 }
 
-void chip8::OpcodeEX9E(WORD opcode)
+void chip8::OpcodeEX9E(uint16_t opcode)
 {
     // Key pressed instruction
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
 
-    int key = m_Registers[regx];
+    uint16_t key = m_Registers[regx];
 
     if (m_KeyState[key] == 1)
         m_ProgramCounter += 2;
 }
 
-void chip8::OpcodeEXA1(WORD opcode)
+void chip8::OpcodeEXA1(uint16_t opcode)
 {
     // Key pressed instruction
-    int regx = opcode & 0x0F00; // vrati recimo 0x200, ali se trazi 0x2 pa se shifta za 2 znamenke 2 * 4
+    uint16_t regx = opcode & 0x0F00; // vrati recimo 0x200, ali se trazi 0x2 pa se shifta za 2 znamenke 2 * 4
     regx >>= 8;
 
-    int key = m_Registers[regx];
+    uint16_t key = m_Registers[regx];
 
     if (m_KeyState[key] == 0)
         m_ProgramCounter += 2;
 }
 
-void chip8::OpcodeFX07(WORD opcode)
+void chip8::OpcodeFX07(uint16_t opcode)
 {
     // delay timer value
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
 
     m_Registers[regx] = m_DelayTimer;
 }
 
-void chip8::OpcodeFX0A(WORD opcode)
+void chip8::OpcodeFX0A(uint16_t opcode)
 {
     // Wait for key press instruction
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
 
     int keypressed = -1;
@@ -528,58 +527,58 @@ void chip8::OpcodeFX0A(WORD opcode)
         m_Registers[regx] = keypressed;
 }
 
-void chip8::OpcodeFX15(WORD opcode)
+void chip8::OpcodeFX15(uint16_t opcode)
 {
     // Delay timer
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
 
     m_DelayTimer = m_Registers[regx];
 }
 
-void chip8::OpcodeFX18(WORD opcode)
+void chip8::OpcodeFX18(uint16_t opcode)
 {
     // Sound timer
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 0;
 
     m_Soundtimer = m_Registers[regx];
 }
 
-void chip8::OpcodeFX1E(WORD opcode)
+void chip8::OpcodeFX1E(uint16_t opcode)
 {
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
 
     m_AdressI = m_AdressI + m_Registers[regx];
 }
 
-void chip8::OpcodeFX29(WORD opcode)
+void chip8::OpcodeFX29(uint16_t opcode)
 {
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
     m_AdressI = m_Registers[regx] * 5;
 }
 
-void chip8::OpcodeFX33(WORD opcode)
+void chip8::OpcodeFX33(uint16_t opcode)
 {
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
 
-    int value = m_Registers[regx];
+    uint16_t value = m_Registers[regx];
 
-    int hundreds = value / 100;
-    int tens = (value / 10) % 10;
-    int units = value % 10;
+    uint16_t hundreds = value / 100;
+    uint16_t tens = (value / 10) % 10;
+    uint16_t units = value % 10;
 
     m_GameMemory[m_AdressI] = hundreds;
     m_GameMemory[m_AdressI + 1] = tens;
     m_GameMemory[m_AdressI + 2] = units;
 }
 
-void chip8::OpcodeFX55(WORD opcode)
+void chip8::OpcodeFX55(uint16_t opcode)
 {
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
 
     for (int i = 0; i <= regx; i++)
@@ -590,9 +589,9 @@ void chip8::OpcodeFX55(WORD opcode)
     m_AdressI = m_AdressI + regx + 1;
 }
 
-void chip8::OpcodeFX65(WORD opcode)
+void chip8::OpcodeFX65(uint16_t opcode)
 {
-    int regx = opcode & 0x0F00;
+    uint16_t regx = opcode & 0x0F00;
     regx >>= 8;
 
     for (int i = 0; i <= regx; i++)
